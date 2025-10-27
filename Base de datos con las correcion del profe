@@ -1,0 +1,136 @@
+
+CREATE DATABASE PeluqueriaCanina
+  COLLATE Latin1_General_CI_AI;
+GO
+USE PeluqueriaCanina;
+GO
+
+CREATE TABLE Personas (
+    id_persona INT IDENTITY(1,1) PRIMARY KEY,
+    apellido VARCHAR(100) NOT NULL,
+    nombre   VARCHAR(100) NOT NULL,
+    documento VARCHAR(30) UNIQUE,
+    direccion VARCHAR(150),
+    email     VARCHAR(100),
+    telefono  VARCHAR(20),
+    activo BIT NOT NULL DEFAULT 1,
+    fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_modificacion DATETIME NULL
+);
+
+
+CREATE TABLE Usuario (
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    id_persona INT NOT NULL,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    contraseña VARCHAR(100) NOT NULL,   
+    tipo_usuario VARCHAR(20) NOT NULL, 
+    activo BIT NOT NULL DEFAULT 1,
+    fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_modificacion DATETIME NULL,
+    CONSTRAINT FK_Usuario_Personas
+      FOREIGN KEY (id_persona) REFERENCES Personas(id_persona)
+);
+
+
+CREATE TABLE Empleado (
+    id_empleado INT IDENTITY(1,1) PRIMARY KEY,
+    id_persona INT NOT NULL UNIQUE, 
+    especialidad VARCHAR(50) NOT NULL,
+    fecha_ingreso DATE,
+    activo BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_Empleado_Personas
+      FOREIGN KEY (id_persona) REFERENCES Personas(id_persona)
+);
+
+
+CREATE TABLE Cliente (
+    id_cliente INT IDENTITY(1,1) PRIMARY KEY,
+    id_persona INT NOT NULL UNIQUE,  
+    persona_autorizada_retiro VARCHAR(100),
+    franja_horaria_preferida   VARCHAR(100),
+    observaciones VARCHAR(200),
+    activo BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_Cliente_Personas
+      FOREIGN KEY (id_persona) REFERENCES Personas(id_persona)
+);
+
+
+CREATE TABLE Mascota (
+    id_mascota INT IDENTITY(1,1) PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    raza   VARCHAR(50),
+    especie VARCHAR(50),
+    sexo CHAR(1),
+    fecha_nacimiento DATE,
+    observaciones VARCHAR(200),
+    activo BIT NOT NULL DEFAULT 1,
+    fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_modificacion DATETIME NULL,
+    CONSTRAINT FK_Mascota_Cliente
+      FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
+);
+
+
+CREATE TABLE Servicio (
+    id_servicio INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    duracion_minutos SMALLINT,
+    activo BIT NOT NULL DEFAULT 1,
+    fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_modificacion DATETIME NULL
+);
+
+
+CREATE TABLE Promocion (
+    id_promocion INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin    DATE NOT NULL,
+    descuento DECIMAL(5,2) NOT NULL CHECK (descuento BETWEEN 0 AND 100),
+    activo BIT NOT NULL DEFAULT 1,
+    CHECK (fecha_fin >= fecha_inicio)
+);
+
+
+CREATE TABLE PromocionServicio (
+    id_promocion_servicio INT IDENTITY(1,1) PRIMARY KEY,
+    id_promocion INT NOT NULL,
+    id_servicio  INT NOT NULL,
+    CONSTRAINT UQ_PromocionServicio UNIQUE (id_promocion, id_servicio),
+    CONSTRAINT FK_PS_Promocion FOREIGN KEY (id_promocion) REFERENCES Promocion(id_promocion),
+    CONSTRAINT FK_PS_Servicio  FOREIGN KEY (id_servicio)  REFERENCES Servicio(id_servicio)
+);
+
+
+CREATE TABLE Turno (
+    id_turno INT IDENTITY(1,1) PRIMARY KEY,
+    fecha DATE NOT NULL,
+    hora  TIME NOT NULL,
+    estado VARCHAR(20) NOT NULL
+      CHECK (estado IN ('programado','confirmado','atendido','cancelado')),
+    id_mascota INT NOT NULL,
+    id_servicio INT NOT NULL,
+    id_empleado INT NOT NULL,
+    id_promocion_aplicada INT NULL,  
+    observaciones VARCHAR(200),
+    precio_final DECIMAL(10,2),
+    fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
+    fecha_modificacion DATETIME NULL,
+    CONSTRAINT FK_Turno_Mascota   FOREIGN KEY (id_mascota) REFERENCES Mascota(id_mascota),
+    CONSTRAINT FK_Turno_Servicio  FOREIGN KEY (id_servicio) REFERENCES Servicio(id_servicio),
+    CONSTRAINT FK_Turno_Empleado  FOREIGN KEY (id_empleado) REFERENCES Empleado(id_empleado),
+    CONSTRAINT FK_Turno_Promocion FOREIGN KEY (id_promocion_aplicada) REFERENCES Promocion(id_promocion)
+);
+
+
+CREATE TABLE ActividadUsuario (
+    id_actividad INT IDENTITY(1,1) PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    fecha DATETIME NOT NULL DEFAULT GETDATE(),
+    descripcion VARCHAR(200) NOT NULL,
+    CONSTRAINT FK_ActividadUsuario_Usuario
+      FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
