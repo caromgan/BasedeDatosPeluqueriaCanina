@@ -116,20 +116,50 @@ VALUES
 GO
 
 ---
---- 9. INSERTS para la tabla Turno (10 registros)
+--- 9. INSERTS para la tabla Turno (10 registros) -- Modificado
 ---
-INSERT INTO Turno (fecha, hora, estado, id_mascota, id_servicio, id_empleado, id_promocion_aplicada, observaciones, precio_final)
+INSERT INTO Turno (fecha, hora, estado, id_mascota, id_servicio, id_empleado,
+                   id_promocion_aplicada, observaciones, precio_final)
 VALUES
-('2025-11-14', '10:00:00', 'atendido', 11, 2, 2, 1, 'Perro tranquilo, se usó shampoo hipoalergénico.', 1700.00), -- Fido (Mediano - Desc 15%)
-('2025-11-14', '11:00:00', 'atendido', 12, 4, 3, NULL, 'Corte de pelo perfecto.', 3500.00), -- Lulú (Corte Estándar)
-('2025-11-15', '14:30:00', 'confirmado', 13, 7, 3, 3, NULL, 3200.00), -- Ronnie (Estética Felina - Desc 20%)
-('2025-11-15', '16:00:00', 'programado', 14, 2, 2, NULL, 'Cliente nuevo, probar si se deja manipular.', 2000.00), -- Princesa
-('2025-11-16', '09:00:00', 'programado', 15, 3, 4, NULL, 'Solo baño, sin secado forzado.', 2800.00), -- Sasha
-('2025-11-16', '10:30:00', 'cancelado', 12, 9, 3, NULL, 'Cliente canceló por enfermedad.', 500.00), -- Mishi
-('2025-11-17', '12:00:00', 'programado', 18, 5, 2, 4, NULL, 950.00), -- Rocky (Corte Higiénico - Desc 5%)
-('2025-11-17', '15:00:00', 'programado', 14, 2, 4, NULL, NULL, 2000.00), -- Toby
-('2025-11-18', '17:00:00', 'programado', 12, 1, 2, 2, NULL, 1350.00), -- Kitty (Baño Pequeño - Desc 10%)
-('2025-11-18', '18:30:00', 'programado', 13, 4, 4, NULL, NULL, 3500.00); -- Max
+-- 1. Fido - Baño pequeño + Promo Invierno (15%)
+('2025-11-10', '09:00', 'programado', 1, 1, 2, 1,
+ 'Aplicado descuento de invierno 15%.', 1500 - (1500 * 0.15)),
+
+-- 2. Mishi - Estética Felina + Promo Gatos Mensual (20%)
+('2025-11-11', '10:30', 'confirmado', 2, 7, 3, 3,
+ 'Gata muy tranquila, promo mensual aplicada.', 4000 - (4000 * 0.20)),
+
+-- 3. Lulú - Baño mediano + Promo Invierno (15%)
+('2025-11-12', '11:00', 'confirmado', 3, 2, 2, 1,
+ 'Cliente pidió corte más corto.', 2000 - (2000 * 0.15)),
+
+-- 4. Toby - Corte estándar + Promo Cumpleaños (5%)
+('2025-11-13', '14:00', 'programado', 4, 4, 4, 4,
+ 'Promo cumpleaños aplicada por aniversario del cliente.', 3500 - (3500 * 0.05)),
+
+-- 5. Sasha - Baño grande (sin promo)
+('2025-11-14', '15:30', 'programado', 5, 3, 2, NULL,
+ 'Mascota nerviosa con secador.', 2800),
+
+-- 6. Ronnie - Corte higiénico + Promo Cumpleaños (5%)
+('2025-11-15', '09:15', 'atendido', 6, 5, 1, 4,
+ 'Cliente conforme con el resultado.', 1000 - (1000 * 0.05)),
+
+-- 7. Princesa - Corte de uñas (sin promo)
+('2025-11-16', '17:00', 'atendido', 7, 9, 4, NULL,
+ 'Corte rápido y sin inconvenientes.', 500),
+
+-- 8. Rocky - Baño grande (sin promo)
+('2025-11-17', '13:00', 'cancelado', 8, 3, 2, NULL,
+ 'Cancelado por enfermedad de la mascota.', 2800),
+
+-- 9. Kitty - Estética felina + Promo Gatos Mensual (20%)
+('2025-11-18', '11:30', 'confirmado', 9, 7, 3, 3,
+ 'Cliente pidió cuidado extra de uñas.', 4000 - (4000 * 0.20)),
+
+-- 10. Max - Día de Spa (sin promo)
+('2025-11-19', '16:45', 'programado', 10, 8, 4, NULL,
+ 'Servicio completo, incluye masaje.', 6000);
 GO
 
 ---
@@ -146,3 +176,4 @@ VALUES
 (1, 'Actualizó la descripción de la Promoción 1.'),
 (3, 'Canceló el turno de Mishi (id_turno 6).');
 GO
+
