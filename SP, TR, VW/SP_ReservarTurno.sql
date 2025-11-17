@@ -1,3 +1,5 @@
+
+
 create OR ALTER PROCEDURE SP_ReservarTurno
     @id_mascota  INT,
     @id_servicio INT,
@@ -51,7 +53,7 @@ BEGIN
     FROM Servicio
     WHERE id_servicio = @id_servicio;
   /*
-    PromociÃ³n vigente
+    Promoción vigente
   */
     DECLARE @id_promocion_aplicada INT = NULL;
     DECLARE @descuento DECIMAL(5,2) = 0;

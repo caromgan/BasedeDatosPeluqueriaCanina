@@ -1,3 +1,5 @@
+USE PeluqueriaCanina
+GO
 CREATE OR ALTER VIEW VW_TurnosPendientes
 AS
 SELECT
