@@ -2,7 +2,7 @@ USE PeluqueriaCanina
 
 GO
 
-ALTER PROCEDURE SP_RegistrarActividad(
+CREATE PROCEDURE SP_RegistrarActividad(
 	@id_usuario INT,
 	@descripcion VARCHAR(200)
 )
@@ -10,13 +10,13 @@ AS
 BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
-		---Si no existe un registro con el mismo id de usuario como el que ingresamos...
-        IF NOT EXISTS (SELECT 1 FROM ActividadUsuario WHERE id_usuario = @id_usuario)
+		---Si no existe el usuario...
+        IF NOT EXISTS (SELECT 1 FROM Usuario WHERE id_usuario = @id_usuario)
         BEGIN
 			---Muestra este mensaje
-            RAISERROR('No se registra actividad de este usuario', 16, 1);
+            RAISERROR('El usuario ingresado no existe', 16, 1);
         END
-		---Si existe actividad del usuario, se registra el registro
+		---Si existe el usuario, se registra la actividad
         INSERT INTO ActividadUsuario(id_usuario,fecha,descripcion)
         VALUES (@id_usuario,GETDATE(),@descripcion);
 
