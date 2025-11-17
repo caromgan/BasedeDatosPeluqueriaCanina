@@ -1,0 +1,86 @@
+create OR ALTER PROCEDURE SP_ReservarTurno
+    @id_mascota  INT,
+    @id_servicio INT,
+    @id_empleado INT,
+    @fecha       DATE,
+    @hora        TIME,
+    @observaciones VARCHAR(200) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+ /*
+ Validaciones
+ */
+    IF NOT EXISTS (SELECT 1 FROM Mascota WHERE id_mascota = @id_mascota)
+    BEGIN
+        RAISERROR('La mascota no existe.', 16, 1);
+        RETURN;
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM Servicio WHERE id_servicio = @id_servicio)
+    BEGIN
+        RAISERROR('El servicio no existe.', 16, 1);
+        RETURN;
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM Empleado WHERE id_empleado = @id_empleado)
+    BEGIN
+        RAISERROR('El empleado no existe.', 16, 1);
+        RETURN;
+    END;
+
+    IF EXISTS (
+        SELECT 1
+        FROM Turno
+        WHERE fecha = @fecha
+          AND hora  = @hora
+          AND estado <> 'cancelado'
+          AND (id_empleado = @id_empleado OR id_mascota = @id_mascota)
+    )
+    BEGIN
+        RAISERROR('Ya existe un turno para esa mascota o empleado en ese horario.', 16, 1);
+        RETURN;
+    END;
+
+     /*
+     Precio Base
+     */
+    DECLARE @precio_base DECIMAL(10,2);
+    SELECT @precio_base = precio
+    FROM Servicio
+    WHERE id_servicio = @id_servicio;
+  /*
+    Promoción vigente
+  */
+    DECLARE @id_promocion_aplicada INT = NULL;
+    DECLARE @descuento DECIMAL(5,2) = 0;
+
+    SELECT TOP 1 
+        @id_promocion_aplicada = pr.id_promocion,
+        @descuento = pr.descuento
+    FROM Promocion pr
+    JOIN PromocionServicio ps ON ps.id_promocion = pr.id_promocion
+    WHERE ps.id_servicio = @id_servicio
+      AND pr.activo = 1
+      AND @fecha BETWEEN pr.fecha_inicio AND pr.fecha_fin
+    ORDER BY pr.descuento DESC;
+
+    DECLARE @precio_final DECIMAL(10,2);
+    SET @precio_final = @precio_base * (1 - (@descuento / 100.0));
+
+/*
+Insertar
+*/
+    INSERT INTO Turno (
+        fecha, hora, estado,
+        id_mascota, id_servicio, id_empleado,
+        id_promocion_aplicada, observaciones, precio_final
+    )
+    VALUES (
+        @fecha, @hora, 'programado',
+        @id_mascota, @id_servicio, @id_empleado,
+        @id_promocion_aplicada, @observaciones, @precio_final
+    );
+END;
+GO
