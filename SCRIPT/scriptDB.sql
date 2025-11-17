@@ -23,7 +23,7 @@ CREATE TABLE Usuario (
     id_usuario INT IDENTITY(1,1) PRIMARY KEY,
     id_persona INT NOT NULL,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
-    contraseÃ±a VARCHAR(100) NOT NULL,   
+    contraseña VARCHAR(100) NOT NULL,   
     tipo_usuario VARCHAR(20) NOT NULL, 
     activo BIT NOT NULL DEFAULT 1,
     fecha_alta DATETIME NOT NULL DEFAULT GETDATE(),
